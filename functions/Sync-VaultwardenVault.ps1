@@ -1,4 +1,5 @@
-function Sync-VaultwardenVault {
+function Sync-VaultwardenVault
+{
     <#
     .SYNOPSIS
         Forces a synchronization of the Vaultwarden vault.
@@ -23,10 +24,12 @@ function Sync-VaultwardenVault {
         [switch]$NoStatus
     )
     
-    try {
+    try
+    {
         # Verify that we're connected to Vaultwarden
         $status = & bw status | ConvertFrom-Json
-        if ($status.status -ne "unlocked") {
+        if ($status.status -ne "unlocked")
+        {
             throw "Not authenticated with Vaultwarden or vault is locked. Please run Connect-VaultwardenAPI first."
         }
         
@@ -34,24 +37,29 @@ function Sync-VaultwardenVault {
         Write-Verbose "Forcing synchronization of the Vaultwarden vault"
         $syncOutput = & bw sync --force 2>&1
         
-        if ($syncOutput -match "error|failed|not found|invalid") {
+        if ($syncOutput -match "error|failed|not found|invalid")
+        {
             throw "Failed to synchronize the vault: $syncOutput"
         }
         
-        if (-not $NoStatus) {
+        if (-not $NoStatus)
+        {
             Write-Output "Vault synchronized successfully"
         }
         
         # Log if Write-VWLog is available
-        if (Get-Command -Name Write-VWLog -ErrorAction SilentlyContinue) {
+        if (Get-Command -Name Write-VWLog -ErrorAction SilentlyContinue)
+        {
             Write-VWLog -Message "Vault synchronized successfully" -Level Information -Category Synchronization
         }
         
         return $true
     }
-    catch {
+    catch
+    {
         # Log if Write-VWLog is available
-        if (Get-Command -Name Write-VWLog -ErrorAction SilentlyContinue) {
+        if (Get-Command -Name Write-VWLog -ErrorAction SilentlyContinue)
+        {
             Write-VWLog -Message "Failed to synchronize the vault: $_" -Level Error -Category Synchronization -EventId 1003 -Exception $_
         }
         
